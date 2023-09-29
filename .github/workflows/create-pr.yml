@@ -17,10 +17,10 @@ jobs:
         source_repo: pablohashescobar/closed-repo
         source_branch: master
         destination_branch: master
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ secrets.AUTH_TOKEN }}
     - uses: repo-sync/pull-request@v2
       name: Create pull request
       with:
         source_branch: master
         destination_branch: master
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ secrets.AUTH_TOKEN }}
