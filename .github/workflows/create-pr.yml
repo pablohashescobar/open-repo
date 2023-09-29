@@ -6,18 +6,21 @@ on:
       - master # Trigger the workflow on push to master
 
 jobs:
-  create-pr:
+  repo-sync:
+    name: Repo Sync
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout source code
-        uses: actions/checkout@v2
-
-      - name: Create PR to closed repo
-        uses: repo-sync/pull-request@v2
-        with:
-          destination_repository: pablohashescobar/closed-repo
-          destination_branch: master
-          github_token: ${{ secrets.CLOSED_REPO_ACCESS_TOKEN }}
-          pr_title: "Syncing updates from open-source-repo"
-          pr_body: "Updates have been made in the open-source-repo. This PR syncs those updates to the closed-source-repo."
+    - uses: actions/checkout@v3
+    - uses: repo-sync/github-sync@v2
+      name: Sync repo to branch
+      with:
+        source_repo: pablohashescobar/open-repo
+        source_branch: master
+        destination_branch: master
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+    - uses: repo-sync/pull-request@v2
+      name: Create pull request
+      with:
+        source_branch: master
+        destination_branch: master
+        github_token: ${{ secrets.GITHUB_TOKEN }}
