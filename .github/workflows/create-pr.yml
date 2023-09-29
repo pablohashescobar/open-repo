@@ -14,7 +14,7 @@ jobs:
     - uses: repo-sync/github-sync@v2
       name: Sync repo to branch
       with:
-        source_repo: pablohashescobar/open-repo
+        source_repo: pablohashescobar/closed-repo
         source_branch: master
         destination_branch: master
         github_token: ${{ secrets.GITHUB_TOKEN }}
