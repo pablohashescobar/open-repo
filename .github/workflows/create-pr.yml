@@ -1,0 +1,23 @@
+name: Create PR to Closed Repo
+
+on:
+  push:
+    branches:
+      - master # Trigger the workflow on push to master
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+
+      - name: Create PR to closed repo
+        uses: repo-sync/pull-request@v2
+        with:
+          destination_repository: pablohashescobar/closed-repo
+          destination_branch: master
+          github_token: ${{ secrets.CLOSED_REPO_ACCESS_TOKEN }}
+          pr_title: "Syncing updates from open-source-repo"
+          pr_body: "Updates have been made in the open-source-repo. This PR syncs those updates to the closed-source-repo."
