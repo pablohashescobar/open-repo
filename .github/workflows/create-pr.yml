@@ -23,7 +23,7 @@ jobs:
           git config --global user.name "$USER_NAME"
 
           # add `repo-b` as a remote repository
-          git remote add repo-b https://$GH_PAT@github.com/pablohashescobar/closed-repo.git
+          git remote add repo-b https://x-access-token:$GH_PAT@github.com/pablohashescobar/closed-repo.git
 
           # create a new branch in `repo-b`
           git checkout -b new-changes-branch
