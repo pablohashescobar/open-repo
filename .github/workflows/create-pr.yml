@@ -14,7 +14,7 @@ jobs:
 
       - name: Push changes to Repo B
         env:
-          GH_PAT: ${{ secrets.AUTH_TOKEN }} # GitHub personal access tokens
+          GH_PAT: ${{ secrets.ACTION_TOKEN }} # GitHub personal access tokens
           USER_EMAIL: nikhilschacko@gmail.com # configure with the correct email
           USER_NAME: pablohashescobar # configure with the correct username
         run: |
