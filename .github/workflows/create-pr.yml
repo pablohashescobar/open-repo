@@ -1,26 +1,45 @@
-name: Create PR to Closed Repo
+name: Synchronize and Create PR to Repo B
 
 on:
   push:
     branches:
-      - master # Trigger the workflow on push to master
+      - master # adjust if your default branch has a different name
 
 jobs:
-  repo-sync:
-    name: Repo Sync
+  sync:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: repo-sync/github-sync@v2
-      name: Sync repo to branch
-      with:
-        source_repo: pablohashescobar/closed-repo
-        source_branch: master
-        destination_branch: master
-        github_token: ${{ secrets.AUTH_TOKEN }}
-    - uses: repo-sync/pull-request@v2
-      name: Create pull request
-      with:
-        source_branch: master
-        destination_branch: master
-        github_token: ${{ secrets.AUTH_TOKEN }}
+      - name: Checkout source repository
+        uses: actions/checkout@v2
+
+      - name: Push changes to Repo B
+        env:
+          GH_PAT: ${{ secrets.AUTH_TOKEN }} # GitHub personal access token
+          USER_EMAIL: nikhilschacko@gmail.com # configure with the correct email
+          USER_NAME: pablohashescobar # configure with the correct username
+        run: |
+          # configure Git
+          git config --global user.email "$USER_EMAIL"
+          git config --global user.name "$USER_NAME"
+
+          # add `repo-b` as a remote repository
+          git remote add repo-b https://$GH_PAT@github.com/pablohashescobar/closed-repo.git
+
+          # create a new branch in `repo-b`
+          git checkout -b new-changes-branch
+
+          # push the changes to the new branch in `repo-b`
+          git push repo-b new-changes-branch
+
+      - name: Create PR in Repo B
+        env:
+          GH_PAT: ${{ secrets.AUTH_TOKEN }}
+        run: |
+          # install GitHub CLI
+          sudo apt-get install gh
+
+          # authenticate GitHub CLI
+          echo "$GH_PAT" | gh auth login --with-token
+
+          # create PR in `repo-b`
+          gh pr create --repo pablohashescobar/closed-repo --base master --head new-changes-branch --title "New changes from Repo A" --body "Synchronize changes from Repo A to Repo B" --draft
