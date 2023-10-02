@@ -33,12 +33,14 @@ jobs:
 
       - name: Push Changes to Plane-EE Repository
         env:
-            GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }} 
+            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-            TARGET_REPO="pablohashescobar/closed-repo"
-            TARGET_BRANCH="${{ env.BRANCH_NAME }}"
-            
+            TARGET_REPO="pablohashescobar/${{ secrets.REPO_NAME }}"
+            TARGET_BRANCH="${{ secrets.REPO_TARGET_BRANCH }}"
+            SOURCE_BRANCH="${{ env.BRANCH_NAME }}"
+
             git remote add target "https://$GH_TOKEN@github.com/$TARGET_REPO.git"
+            git push target $SOURCE_BRANCH:$SOURCE_BRANCH
             git push target "HEAD:refs/heads/$TARGET_BRANCH"
 
 
@@ -48,13 +50,14 @@ jobs:
         run: |
             TARGET_REPO="pablohashescobar/closed-repo"
             TARGET_BRANCH="${{ env.BRANCH_NAME }}"
-            
+
             PR_TITLE="${{ github.event.pull_request.title }}"
             PR_BODY="${{ github.event.pull_request.body }}"
 
             gh pr create \
-              --base main \
-              --head $TARGET_BRANCH \
+              --base $TARGET_BRANCH \
+              --head $SOURCE_BRANCH \
               --title "$PR_TITLE" \
               --body "$PR_BODY" \
               --repo $TARGET_REPO
+
