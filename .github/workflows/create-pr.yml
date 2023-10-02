@@ -30,7 +30,7 @@ jobs:
         run: |
           # Replace with your information
           TARGET_REPO="pablohashescobar/closed-repo"
-          TARGET_BRANCH="maintain"
+          TARGET_BRANCH="master"
           SOURCE_BRANCH="${{ github.ref }}"
           
           git remote add target "https://$GH_TOKEN@github.com/$TARGET_REPO.git"
