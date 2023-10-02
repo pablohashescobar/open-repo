@@ -14,6 +14,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
         with:
+          ref: ${{ github.event.pull_request.head.sha }}
           persist-credentials: false
           fetch-depth: 0
           
@@ -30,25 +31,29 @@ jobs:
           sudo apt update
           sudo apt install gh -y
 
-      - name: Create Pull Request
+      - name: Push Changes to Plane-EE Repository
         env:
-            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }} 
         run: |
-            TARGET_REPO="pablohashescobar/${{ secrets.REPO_NAME }}"
-            TARGET_BRANCH="${{ secrets.REPO_TARGET_BRANCH }}"
-            SOURCE_BRANCH="${{ env.BRANCH_NAME }}"
+            TARGET_REPO="pablohashescobar/closed-repo"
+            TARGET_BRANCH="${{ env.BRANCH_NAME }}"
             
-            git checkout $SOURCE_BRANCH
             git remote add target "https://$GH_TOKEN@github.com/$TARGET_REPO.git"
-            git push target $SOURCE_BRANCH:$SOURCE_BRANCH
+            git push target "HEAD:$TARGET_BRANCH"
 
+      - name: Create Pull Request in Plane-EE Repository
+        env:
+            GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }} 
+        run: |
+            TARGET_REPO="pablohashescobar/closed-repo"
+            TARGET_BRANCH="${{ env.BRANCH_NAME }}"
+            
             PR_TITLE="${{ github.event.pull_request.title }}"
             PR_BODY="${{ github.event.pull_request.body }}"
-            
+
             gh pr create \
-              --base $TARGET_BRANCH \
-              --head $SOURCE_BRANCH \
+              --base main \
+              --head $TARGET_BRANCH \
               --title "$PR_TITLE" \
               --body "$PR_BODY" \
               --repo $TARGET_REPO
-
