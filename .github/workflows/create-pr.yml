@@ -34,7 +34,7 @@ jobs:
         run: |
           TARGET_REPO="pablohashescobar/closed-repo"
           TARGET_BRANCH="maintain"
-          SOURCE_BRANCH="${{ env.BRANCH_NAME }}"
+          SOURCE_BRANCH="master"
           
           git checkout $SOURCE_BRANCH
           git remote add target "https://$GH_TOKEN@github.com/$TARGET_REPO.git"
@@ -43,7 +43,7 @@ jobs:
           gh pr create \
           --base $TARGET_BRANCH \
           --head $SOURCE_BRANCH \
-          -t "Automated PR from $SOURCE_BRANCH" \
+          -t "Automated PR from" \
           -b "Automated PR created from ${{ github.repository }}/$SOURCE_BRANCH" \
           --repo $TARGET_REPO
-    
+
