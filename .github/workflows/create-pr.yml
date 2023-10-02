@@ -39,7 +39,7 @@ jobs:
             TARGET_BRANCH="${{ env.BRANCH_NAME }}"
             
             git remote add target "https://$GH_TOKEN@github.com/$TARGET_REPO.git"
-            git push target "HEAD:$TARGET_BRANCH"
+            git push target "HEAD:refs/heads/$TARGET_BRANCH"
 
       - name: Create Pull Request in Plane-EE Repository
         env:
