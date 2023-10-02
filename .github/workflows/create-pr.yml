@@ -1,45 +1,40 @@
-name: Synchronize and Create PR to Repo B
+name: Create PR in Different Repository
 
 on:
   push:
     branches:
-      - master # adjust if your default branch has a different name
+      - master  # or the name of your default branch
 
 jobs:
-  sync:
+  create_pr:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout source repository
+      - name: Checkout Code
         uses: actions/checkout@v2
 
-      - name: Push changes to Repo B
-        env:
-          GH_PAT: ${{ secrets.ACTION_TOKEN }} # GitHub personal access tokens
-          USER_EMAIL: nikhilschacko@gmail.com # configure with the correct email
-          USER_NAME: pablohashescobar # configure with the correct username
+      - name: Setup GH CLI
         run: |
-          # configure Git
-          git config --global user.email "$USER_EMAIL"
-          git config --global user.name "$USER_NAME"
+          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
+          sudo apt-add-repository https://cli.github.com/packages
+          sudo apt update
+          sudo apt install gh
 
-          # add `repo-b` as a remote repository
-          git remote add repo-b https://github.com/pablohashescobar/closed-repo/
-
-          # create a new branch in `repo-b`
-          git checkout -b new-changes-branch
-
-          # push the changes to the new branch in `repo-b`
-          git push repo-b new-changes-branch
-
-      - name: Create PR in Repo B
+      - name: Create Pull Request
         env:
-          GH_PAT: ${{ secrets.AUTH_TOKEN }}
+          GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: |
-          # install GitHub CLI
-          sudo apt-get install gh
-
-          # authenticate GitHub CLI
-          echo "$GH_PAT" | gh auth login --with-token
-
-          # create PR in `repo-b`
-          gh pr create --repo pablohashescobar/closed-repo --base master --head new-changes-branch --title "New changes from Repo A" --body "Synchronize changes from Repo A to Repo B" --draft
+          # Replace with your information
+          TARGET_REPO="pablohashescobar/closed-repo"
+          TARGET_BRANCH="master"
+          SOURCE_BRANCH="${{ github.ref }}"
+          
+          git remote add target "https://x-access-token:$GH_TOKEN@github.com/$TARGET_REPO.git"
+          git push target HEAD:$TARGET_BRANCH
+          
+          gh pr create \
+            --base $TARGET_BRANCH \
+            --head $SOURCE_BRANCH \
+            --title "Automated PR" \
+            --body "Automated PR created from ${{ github.repository }}" \
+            --repo $TARGET_REPO \
+            --token $GH_TOKEN
