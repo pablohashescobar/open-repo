@@ -38,7 +38,7 @@ jobs:
           
           git checkout $SOURCE_BRANCH
           git remote add target "https://$GH_TOKEN@github.com/$TARGET_REPO.git"
-          git push target HEAD:$SOURCE_BRANCH
+          git push target $SOURCE_BRANCH
           
           gh pr create \
             --base $TARGET_BRANCH \
