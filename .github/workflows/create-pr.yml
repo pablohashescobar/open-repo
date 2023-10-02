@@ -52,7 +52,7 @@ jobs:
             PR_BODY="${{ github.event.pull_request.body }}"
 
             gh pr create \
-              --base main \
+              --base $TARGET_BRANCH \
               --head $TARGET_BRANCH \
               --title "$PR_TITLE" \
               --body "$PR_BODY" \
