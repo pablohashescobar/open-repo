@@ -41,8 +41,9 @@ jobs:
           git push target $SOURCE_BRANCH
           
           gh pr create \
-            --base $TARGET_BRANCH \
-            --head $SOURCE_BRANCH \
-            --title "Automated PR from" \
-            --body "Automated PR created from ${{ github.repository }}/$SOURCE_BRANCH" \
-            --repo $TARGET_REPO
+          --base $TARGET_BRANCH \
+          --head $SOURCE_BRANCH \
+          --title "Automated PR from $SOURCE_BRANCH" \
+          --body "Automated PR created from ${{ github.repository }}/$SOURCE_BRANCH" \
+          --repo $TARGET_REPO
+    
