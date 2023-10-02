@@ -35,7 +35,7 @@ jobs:
             GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: |
             TARGET_REPO="pablohashescobar/closed-repo"
-            TARGET_BRANCH="maintain"
+            TARGET_BRANCH="develop"
             SOURCE_BRANCH="${{ env.BRANCH_NAME }}"
             
             git checkout $SOURCE_BRANCH
