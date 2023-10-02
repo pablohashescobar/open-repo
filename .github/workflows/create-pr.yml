@@ -1,12 +1,14 @@
-name: Create PR in Different Repository
+name: Create PR in Different Repository on PR Merge
 
 on:
-  push:
-    branches:
-      - master
+  pull_request:
+    types:
+      - closed
 
 jobs:
   create_pr:
+    # Only run the job when a PR is merged
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -15,9 +17,9 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
           
-      - name: Extract Branch Name
-        shell: bash
-        run: echo "BRANCH_NAME=$(git branch --merged | egrep -v '(^\*|master|main)')" >> $GITHUB_ENV
+      - name: Set up Branch Name
+        run: |
+          echo "BRANCH_NAME=${{ github.head_ref }}" >> $GITHUB_ENV
           
       - name: Setup GH CLI
         run: |
@@ -30,20 +32,26 @@ jobs:
 
       - name: Create Pull Request
         env:
-          GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+            GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: |
-          TARGET_REPO="pablohashescobar/closed-repo"
-          TARGET_BRANCH="maintain"
-          SOURCE_BRANCH="master"
-          
-          git checkout $SOURCE_BRANCH
-          git remote add target "https://$GH_TOKEN@github.com/$TARGET_REPO.git"
-          git push target $SOURCE_BRANCH
-          
-          gh pr create \
-          --base $TARGET_BRANCH \
-          --head $SOURCE_BRANCH \
-          -t "Automated PR from" \
-          -b "Automated PR created from ${{ github.repository }}/$SOURCE_BRANCH" \
-          --repo $TARGET_REPO
+            TARGET_REPO="pablohashescobar/closed-repo"
+            TARGET_BRANCH="develop"
+            SOURCE_BRANCH="${{ env.BRANCH_NAME }}"
+            
+            git checkout $SOURCE_BRANCH
+            git remote add target "https://$GH_TOKEN@github.com/$TARGET_REPO.git"
+            git push target $SOURCE_BRANCH:$SOURCE_BRANCH
+            
+            PR_TITLE="${{ github.event.pull_request.title }}"
+            PR_BODY="${{ github.event.pull_request.body }}"
+            
+            gh pr create \
+              --base $TARGET_BRANCH \
+              --head $SOURCE_BRANCH \
+              --title "$PR_TITLE" \
+              --body "$PR_BODY" \
+              --repo $TARGET_REPO
+  
+
+  
 
