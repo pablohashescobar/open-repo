@@ -30,7 +30,7 @@ jobs:
           TARGET_BRANCH="master"
           SOURCE_BRANCH="${{ github.ref }}"
           
-          git remote add target "https://x-access-token:$GH_TOKEN@github.com/$TARGET_REPO.git"
+          git remote add target "https://$GH_TOKEN@github.com/$TARGET_REPO.git"
           git push target HEAD:$TARGET_BRANCH
           
           gh pr create \
