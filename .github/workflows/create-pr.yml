@@ -41,5 +41,4 @@ jobs:
             --head $SOURCE_BRANCH \
             --title "Automated PR" \
             --body "Automated PR created from ${{ github.repository }}" \
-            --repo $TARGET_REPO \
-            --token $GH_TOKEN
+            --repo $TARGET_REPO
