@@ -1,4 +1,4 @@
-name: Create PR in Different Repository on PR Merge
+name: Create PR in Plane EE Repository to sync the changes
 
 on:
   pull_request:
@@ -34,14 +34,14 @@ jobs:
         env:
             GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: |
-            TARGET_REPO="pablohashescobar/closed-repo"
-            TARGET_BRANCH="develop"
+            TARGET_REPO="pablohashescobar/${{ secrets.REPO_NAME }}"
+            TARGET_BRANCH="${{ secrets.REPO_TARGET_BRANCH }}"
             SOURCE_BRANCH="${{ env.BRANCH_NAME }}"
             
             git checkout $SOURCE_BRANCH
             git remote add target "https://$GH_TOKEN@github.com/$TARGET_REPO.git"
             git push target $SOURCE_BRANCH:$SOURCE_BRANCH
-            
+
             PR_TITLE="${{ github.event.pull_request.title }}"
             PR_BODY="${{ github.event.pull_request.body }}"
             
@@ -51,7 +51,4 @@ jobs:
               --title "$PR_TITLE" \
               --body "$PR_BODY" \
               --repo $TARGET_REPO
-  
-
-  
 
