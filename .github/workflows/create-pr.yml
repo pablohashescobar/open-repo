@@ -7,7 +7,7 @@ on:
 
 jobs:
   create_pr:
-    # Only run the job when a PR is merged
+    # Only run the job when a PR is merged okay
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     permissions:
