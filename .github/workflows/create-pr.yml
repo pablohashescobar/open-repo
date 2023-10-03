@@ -10,8 +10,19 @@ jobs:
     # Only run the job when a PR is merged
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    permissions:
+        pull-requests: write
+        contents: read
     steps:
+      - name: Check SOURCE_REPO
+        id: check_repo
+        env:
+          SOURCE_REPO: ${{ secrets.SOURCE_REPO }}
+        run: |
+          echo "::set-output name=is_correct_repo::$(if [[ "$SOURCE_REPO" == "makeplane/plane" ]]; then echo 'true'; else echo 'false'; fi)"
+
       - name: Checkout Code
+        if: github.event.pull_request.merged == true && steps.check_repo.outputs.is_correct_repo == 'true'
         uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
@@ -33,10 +44,10 @@ jobs:
 
       - name: Push Changes to Plane-EE Repository
         env:
-            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: |
-            TARGET_REPO="pablohashescobar/${{ secrets.REPO_NAME }}"
-            TARGET_BRANCH="${{ secrets.REPO_TARGET_BRANCH }}"
+            TARGET_REPO="pablohashescobar/closed-repo"
+            TARGET_BRANCH=""
             SOURCE_BRANCH="${{ env.BRANCH_NAME }}"
 
             git remote add target "https://$GH_TOKEN@github.com/$TARGET_REPO.git"
@@ -60,4 +71,4 @@ jobs:
               --title "$PR_TITLE" \
               --body "$PR_BODY" \
               --repo $TARGET_REPO
-
+  
