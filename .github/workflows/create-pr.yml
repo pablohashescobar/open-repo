@@ -43,25 +43,38 @@ jobs:
           sudo apt update
           sudo apt install gh -y
 
-      - name: Create Pull Request
-        if: steps.check_repo.outputs.is_correct_repo == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        run: |
-          TARGET_REPO="${{ secrets.TARGET_REPO_NAME }}"
-          TARGET_BRANCH="${{ secrets.TARGET_REPO_BRANCH }}"
-          SOURCE_BRANCH="${{ env.SOURCE_BRANCH_NAME }}"
+          - name: Create Pull Request
+          if: steps.check_repo.outputs.is_correct_repo == 'true'
+          env:
+            GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          run: |
+            TARGET_REPO="${{ secrets.TARGET_REPO_NAME }}"
+            TARGET_BRANCH="${{ secrets.TARGET_REPO_BRANCH }}"
+            SOURCE_BRANCH="${{ env.SOURCE_BRANCH_NAME }}"
 
-          git checkout $SOURCE_BRANCH
-          git remote add target "https://$GH_TOKEN@github.com/$TARGET_REPO.git"
-          git push target $SOURCE_BRANCH:$SOURCE_BRANCH
+            git checkout $SOURCE_BRANCH
+            git remote add target "https://$GH_TOKEN@github.com/$TARGET_REPO.git"
+            git fetch target $TARGET_BRANCH
+            git rebase target/$TARGET_BRANCH
 
-          PR_TITLE="${{ github.event.pull_request.title }}"
-          PR_BODY="${{ github.event.pull_request.body }}"
+            git push target $SOURCE_BRANCH:$SOURCE_BRANCH
 
-          gh pr create \
-            --base $TARGET_BRANCH \
-            --head $SOURCE_BRANCH \
-            --title "$PR_TITLE" \
-            --body "$PR_BODY" \
-            --repo $TARGET_REPO
+            PR_TITLE="${{ github.event.pull_request.title }}"
+            PR_BODY="${{ github.event.pull_request.body }}"
+
+            # Remove double quotes
+            PR_TITLE_CLEANED="${PR_TITLE//\"/}"
+            PR_BODY_CLEANED="${PR_BODY//\"/}"
+
+            # Construct PR_BODY_CONTENT using a here-document
+            PR_BODY_CONTENT=$(cat <<EOF
+            $PR_BODY_CLEANED
+            EOF
+            )
+
+            gh pr create \
+              --base $TARGET_BRANCH \
+              --head $SOURCE_BRANCH \
+              --title "[SYNC] $PR_TITLE_CLEANED" \
+              --body "$PR_BODY_CONTENT" \
+              --repo $TARGET_REPO
