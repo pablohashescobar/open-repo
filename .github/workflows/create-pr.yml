@@ -55,7 +55,7 @@ jobs:
           git checkout $SOURCE_BRANCH
           git remote add target "https://$GH_TOKEN@github.com/$TARGET_REPO.git"
           git fetch target $TARGET_BRANCH
-          git rebase target/$TARGET_BRANCH
+          git merge target/$TARGET_BRANCH
 
           git push target $SOURCE_BRANCH:$SOURCE_BRANCH
 
