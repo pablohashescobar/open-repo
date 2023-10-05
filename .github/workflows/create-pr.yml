@@ -55,7 +55,7 @@ jobs:
           git remote add target "https://$GH_TOKEN@github.com/$TARGET_REPO.git"
           git fetch target $TARGET_BRANCH
 
-          BASE_COMMIT=$(git merge-base HEAD target/destination-branch-name)
+          BASE_COMMIT=$(git merge-base HEAD target/$TARGET_BRANCH)
 
           git checkout -b temp $BASE_COMMIT
           git cherry-pick $BASE_COMMIT..$SOURCE_BRANCH
