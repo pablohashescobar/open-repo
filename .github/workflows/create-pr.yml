@@ -62,11 +62,9 @@ jobs:
             PR_TITLE="${{ github.event.pull_request.title }}"
             PR_BODY="${{ github.event.pull_request.body }}"
 
-            # Remove double quotes
             PR_TITLE_CLEANED="${PR_TITLE//\"/}"
             PR_BODY_CLEANED="${PR_BODY//\"/}"
 
-            # Construct PR_BODY_CONTENT using a here-document
             PR_BODY_CONTENT=$(cat <<EOF
             $PR_BODY_CLEANED
             EOF
