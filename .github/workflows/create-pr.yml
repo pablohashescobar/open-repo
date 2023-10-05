@@ -55,6 +55,10 @@ jobs:
           git checkout $SOURCE_BRANCH
           git remote add target "https://$GH_TOKEN@github.com/$TARGET_REPO.git"
           git fetch target $TARGET_BRANCH
+
+          git config --global user.email "nikhilschacko@gmail.com"
+          git config --global user.name "pablohashescobar"
+
           git merge target/$TARGET_BRANCH
 
           git push target $SOURCE_BRANCH:$SOURCE_BRANCH
