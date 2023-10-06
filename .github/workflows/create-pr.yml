@@ -55,7 +55,9 @@ jobs:
           TARGET_REPO="${{ secrets.TARGET_REPO_NAME }}"
 
           git checkout -b ${{ env.NEW_BRANCH_NAME }}
-          git push "https://$GH_TOKEN@github.com/$TARGET_REPO.git" ${{ env.NEW_BRANCH_NAME }}
+          git reset --hard HEAD~1
+          git cherry-pick HEAD@{1}
+          git push "https://$GH_TOKEN@github.com/$TARGET_REPO.git" HEAD:${{ env.NEW_BRANCH_NAME }}
   
 
       - name: Create Pull Request
