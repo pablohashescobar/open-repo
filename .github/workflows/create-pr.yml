@@ -70,4 +70,5 @@ jobs:
             --base $TARGET_BRANCH \
             --head ${{ env.NEW_BRANCH_NAME }} \
             --title "Sync changes from develop" \
+            --body "Syncing changes"
             --repo $TARGET_REPO
