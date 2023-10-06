@@ -2,6 +2,8 @@ name: Create PR in Plane EE Repository to sync the changes
 
 on:
   pull_request:
+    branches:
+      - master
     types:
       - closed
 
@@ -25,13 +27,15 @@ jobs:
         if: steps.check_repo.outputs.is_correct_repo == 'true'
         uses: actions/checkout@v2
         with:
+          ref: master
           persist-credentials: false
           fetch-depth: 0
 
       - name: Set up Branch Name
         if: steps.check_repo.outputs.is_correct_repo == 'true'
         run: |
-          echo "SOURCE_BRANCH_NAME=${{ github.head_ref }}" >> $GITHUB_ENV
+          NEW_BRANCH="sync-${{ github.head_ref }}-$(date +'%Y%m%d%H%M%S')"
+          echo "NEW_BRANCH_NAME=$NEW_BRANCH" >> $GITHUB_ENV
 
       - name: Setup GH CLI
         if: steps.check_repo.outputs.is_correct_repo == 'true'
@@ -43,6 +47,17 @@ jobs:
           sudo apt update
           sudo apt install gh -y
 
+      - name: Create and Push New Branch
+        if: steps.check_repo.outputs.is_correct_repo == 'true'
+        env:
+            GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        run: |
+          TARGET_REPO="${{ secrets.TARGET_REPO_NAME }}"
+
+          git checkout -b ${{ env.NEW_BRANCH_NAME }}
+          git push "https://$GH_TOKEN@github.com/$TARGET_REPO.git" ${{ env.NEW_BRANCH_NAME }}
+  
+
       - name: Create Pull Request
         if: steps.check_repo.outputs.is_correct_repo == 'true'
         env:
@@ -50,15 +65,9 @@ jobs:
         run: |
           TARGET_REPO="${{ secrets.TARGET_REPO_NAME }}"
           TARGET_BRANCH="${{ secrets.TARGET_REPO_BRANCH }}"
-          SOURCE_BRANCH="${{ env.SOURCE_BRANCH_NAME }}"
 
-          git remote add target "https://$GH_TOKEN@github.com/$TARGET_REPO.git"
-          git fetch target $TARGET_BRANCH
-
-          BASE_COMMIT=$(git merge-base HEAD target/$TARGET_BRANCH)
-
-          git checkout -b temp $BASE_COMMIT
-          git cherry-pick $BASE_COMMIT..$SOURCE_BRANCH
-
-          git push target temp-branch
-
+          gh pr create \
+            --base $TARGET_BRANCH \
+            --head ${{ env.NEW_BRANCH_NAME }} \
+            --title "Sync changes from develop" \
+            --repo $TARGET_REPO
